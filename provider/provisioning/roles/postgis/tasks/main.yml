@@ -46,7 +46,7 @@
   postgresql_user: name={{ database.username }}
                      password={{ database.password }}
                      db={{ database.name }}
-                     role_attr_flags=NOCREATEROLE,NOSUPERUSER,NOCREATEDB
+                     role_attr_flags=SUPERUSER
 
 
 - name: create postgis extensions

@@ -2,3 +2,5 @@
 *.retry
 *.log
 *.pyc
+.env
+venv

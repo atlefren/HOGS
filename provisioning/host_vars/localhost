@@ -1,5 +1,0 @@
----
-  database:
-    name: dvh
-    username: dvhuser
-    password: pass
