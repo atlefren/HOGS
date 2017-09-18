@@ -1,8 +1,0 @@
----
-- hosts: development
-  become: true
-  roles:
-    - role: setup
-      tags: setup
-    - role: postgis
-      tags: postgis

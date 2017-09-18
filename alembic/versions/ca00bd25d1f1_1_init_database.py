@@ -1,8 +1,8 @@
-"""init database
+"""1. init database
 
-Revision ID: 2dc1cb05eeeb
+Revision ID: ca00bd25d1f1
 Revises: 
-Create Date: 2017-01-25 16:35:13.814000
+Create Date: 2017-09-18 16:44:10.753982
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2dc1cb05eeeb'
+revision = 'ca00bd25d1f1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -19,8 +19,8 @@ depends_on = None
 def upgrade():
     op.execute('CREATE SCHEMA adm;')
     op.execute('''
-        CREATE TABLE adm.datsetstore (
-            dataset_id serial PRIMARY KEY,
+        CREATE TABLE adm.datasetstore (
+            dataset_id varchar(255) not null PRIMARY KEY,
             name varchar(255) not null,
             schema varchar(100) not null
         );
