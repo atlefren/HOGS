@@ -7,14 +7,34 @@
 
 2. create a .env, set DATABASE_URI=postgres://dvh2:pass@localhost:5432/dvh2
 
-3. create a virtualenv, install packages
+3. Build gdal/ogr with sosi-support
 
-    virtualenv venv
+    git clone https://github.com/kartverket/fyba
+    cd fyba
+    autoreconf --force --install
+    ./configure
+    make -j 8
+    sudo make install
+    cd ..
+
+    sudo apt-get install libproj-dev
+
+    svn checkout https://svn.osgeo.org/gdal/trunk/gdal gdal
+    cd gdal
+    sh autogen.sh
+    ./configure --with-sosi --with-python --with-static-proj
+    make -j 8
+    sudo make install
+
+
+4. create a virtualenv, install packages
+
+    virtualenv --system-site-packages venv
     source venv/bin/activate
     pip install -r requirements.txt
 
-4. upgrade db
-    
+5. upgrade db
+
     alembic upgrade head
 
 ## Alembic

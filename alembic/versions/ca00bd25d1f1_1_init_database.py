@@ -20,9 +20,12 @@ def upgrade():
     op.execute('CREATE SCHEMA adm;')
     op.execute('''
         CREATE TABLE adm.datasetstore (
-            dataset_id varchar(255) not null PRIMARY KEY,
+            dataset_id varchar(255) not null,
             name varchar(255) not null,
-            schema varchar(100) not null
+            schema varchar(100) not null,
+            version bigint not null,
+            created timestamp WITH TIME ZONE not null,
+            PRIMARY KEY (dataset_id, version)
         );
     ''')
 

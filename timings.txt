@@ -1,0 +1,6 @@
+
+import, no unzip, jsonb, no idex
+Time spent importing: 0:38:22.690721
+
+import, no unzip, jsonb, index
+Total time spent    : 0:38:14.838680
