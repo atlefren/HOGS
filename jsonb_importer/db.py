@@ -169,13 +169,12 @@ class Db(object):
             return version[0]
 
     def write_features(self, schema, dataset_id, version, properties, records):
+        columns = ('datasetid', 'version', 'geom', 'attribs')
+        start = datetime.datetime.now()
         f = IteratorFile(dataset_id, version, records)
-
         with self.conn.cursor() as cur:
-            start = datetime.datetime.now()
-            cur.copy_from(f, '%s.%s' % (schema, 'datastore'), columns=('datasetid', 'version', 'geom', 'attribs'))
+            cur.copy_from(f, '%s.%s' % (schema, 'datastore'), columns=columns)
         self.conn.commit()
         elapsed = datetime.datetime.now()
         print 'number of rows copied : %s' % (f._count)
         print 'time spent on copy    : %s' % (elapsed - start)
-        

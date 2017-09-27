@@ -8,7 +8,6 @@ import datetime
 from jsonb_importer import import_dataset
 
 
-
 def unzip(dir_name):
     for item in os.listdir(dir_name):  # loop through items in dir
         if item.endswith('.zip'):
@@ -34,17 +33,22 @@ def get_files(dir_name):
 if __name__ == '__main__':
     start = datetime.datetime.now()
 
+    #import_dataset('test', 'test', ['/mnt/d/code/kartverksdata/dl/160792/0235_N50_Restriksjonsomrader.sos'], 'test')
+
 
     folder = '/mnt/d/code/kartverksdata/dl/160792'
     #folder = '/mnt/d/code/kartverksdata/dl/test'
-    unzip(folder)
+    #unzip(folder)
 
     elapsed = datetime.datetime.now()
     start2 = elapsed
     print 'Time spent unzipping: %s ' % (elapsed - start)
 
     for objtype, files in get_files(folder).iteritems():
-            import_dataset('n50', objtype, files, objtype)
+        #if objtype == 'restriksjonsomrader':
+        import_dataset('n50', objtype, files, objtype)
+
+    #import_dataset('n50', 'hoyde', get_files(folder)['hoyde'], 'hoyde')
 
     elapsed = datetime.datetime.now()
     print 'Time spent importing: %s ' % (elapsed - start2)

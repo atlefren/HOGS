@@ -28,3 +28,6 @@ def normalize(value):
     value = re.sub('[-\s]+', '_', value)
     return value
 
+
+def escape(value):
+    return value.replace('\\', '\\\\')

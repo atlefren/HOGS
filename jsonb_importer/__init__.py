@@ -14,9 +14,9 @@ def load_files(schema, dataset_id, version, files, name):
         print 'No files specified'
         return
     for file in files:
-        fields = file.fields()
         file = OgrFile(file)
-        print 'Write %s features to db' % file.num_features
+        fields = file.fields()
+        # print 'Write %s features to db' % file.num_features
         db.write_features(schema, dataset_id, version, fields, file.records())
         file.destroy()
     db.create_dataset_view(schema, dataset_id, name, version, fields)
@@ -62,5 +62,5 @@ def import_dataset(schema, name, files, dataset_id=None, append=False):
         version = db.get_dataset_version(schema, dataset_id) + 1
         print 'Update dataset %s.%s to version %s' % (schema, dataset_id, version)
         db.create_dataset(schema, dataset_id, name, version, datetime.datetime.now())
-    
+
     load_files_single(schema, dataset_id, version, files, name)

@@ -4,10 +4,13 @@ import io
 import sys
 import json
 
+from helpers import escape
+
 
 class IteratorFile(io.TextIOBase):
     """
         Use this class to support writing geometries to PostGIS using COPY
+        based on https://gist.github.com/jsheedy/ed81cdf18190183b3b7d
     """
 
     def __init__(self, dataset_id, version, records):
@@ -48,12 +51,15 @@ class IteratorFile(io.TextIOBase):
     def _get_next(self):
 
         n = next(self._records)
+        geom = '\N'
+        if n['geom'] is not None:
+            geom = n['geom']
 
         r = '%s\t%s\t%s\t%s' % (
             self._dataset_id,
             self._version,
-            '%s%s' % ('SRID=4326;', n['geom']),
-            json.dumps(n['properties'], ensure_ascii=False)
+            geom,
+            escape(json.dumps(n['properties'], ensure_ascii=False))
         )
 
         self._count += 1
