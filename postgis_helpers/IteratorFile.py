@@ -54,7 +54,6 @@ class IteratorFile(io.TextIOBase):
         geom = '\N'
         if n['geom'] is not None:
             geom = n['geom']
-
         r = '%s\t%s\t%s\t%s' % (
             self._dataset_id,
             self._version,

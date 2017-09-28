@@ -150,7 +150,6 @@ class OgrFileLayer(object):
         fields = self.fields()
         for feature in self.layer:
             geom = feature.GetGeometryRef()
-            geom.Transform(self.coord_trans)
             attrs = {}
             for i, field in enumerate(fields):
                 value = feature.GetField(i)
@@ -159,11 +158,12 @@ class OgrFileLayer(object):
                     value = unicode(value.decode(self.encoding))
                 attrs[field['normalized']] = value
             g = Geometry(geom)
+            g.transform(self.coord_trans)
             if g.is_valid():
                 yield {'geom': g.ewkb_hex(), 'properties': attrs}
             else:
                 reason = g.is_valid_reason()
-                print 'invalid:', reason
-                print 'geom:', g.wkt()
-                print '---'
+                #print 'invalid:', reason
+                #print 'geom:', g.wkt()
+                #print '---'
                 yield {'geom': None, 'properties': attrs, 'reason': reason}
