@@ -19,12 +19,23 @@
 
     sudo apt-get install libproj-dev
 
+    wget http://download.osgeo.org/geos/geos-3.6.2.tar.bz2
+    tar xjf geos*bz2
+    cd geos*
+    ./configure --enable-python
+    make -j 10
+    sudo make install
+    cd ..
+
     svn checkout https://svn.osgeo.org/gdal/trunk/gdal gdal
     cd gdal
     sh autogen.sh
-    ./configure --with-sosi --with-python --with-static-proj
+    ./configure --with-sosi --with-python --with-static-proj --with-geos
     make -j 8
     sudo make install
+
+
+OR: du whatever you like, as long as you end up with gdal/ogr with python-bindings, geos, sosi and proj4...
 
 
 4. create a virtualenv, install packages

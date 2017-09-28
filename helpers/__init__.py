@@ -2,6 +2,9 @@
 import re
 import unicodedata
 
+from geos import to_ewkb_hex
+from geom import Geometry
+
 
 def create_table_name(value):
     """

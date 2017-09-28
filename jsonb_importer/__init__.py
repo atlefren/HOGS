@@ -35,6 +35,7 @@ def load_files_single(schema, dataset_id, version, files, name):
         print 'No files specified'
         return
     file = OgrFile(files[0])
+
     print 'Write %s files to db' % len(files)
     fields = file.fields()
     db.write_features(schema, dataset_id, version, fields, loop_files(files))

@@ -3,13 +3,10 @@
 import codecs
 import os
 
-import ogr
-import osr
+from osgeo import ogr, osr
 import magic
-from shapely.wkb import loads
-from shapely import geos
 
-from helpers import create_table_name
+from helpers import create_table_name, to_ewkb_hex, Geometry
 
 
 def get_encoding(filename):
@@ -127,12 +124,6 @@ class OgrFile(object):
         self.source.Destroy()
 
 
-def dumps(shape, srid=4326):
-    geos.WKBWriter.defaults['include_srid'] = True
-    geos.lgeos.GEOSSetSRID(shape._geom, 4326)
-    return shape.wkb_hex
-
-
 class OgrFileLayer(object):
 
     def __init__(self, layer, encoding):
@@ -160,12 +151,6 @@ class OgrFileLayer(object):
         for feature in self.layer:
             geom = feature.GetGeometryRef()
             geom.Transform(self.coord_trans)
-            geom_wkb = geom.ExportToWkb()
-            shape = None
-            try:
-                shape = loads(geom_wkb)
-            except Exception, e:
-                pass
             attrs = {}
             for i, field in enumerate(fields):
                 value = feature.GetField(i)
@@ -173,7 +158,12 @@ class OgrFileLayer(object):
                 if isinstance(value, basestring):
                     value = unicode(value.decode(self.encoding))
                 attrs[field['normalized']] = value
-            if shape is not None and shape.is_valid:
-                yield {'geom': dumps(shape), 'properties': attrs}
+            g = Geometry(geom)
+            if g.is_valid():
+                yield {'geom': g.ewkb_hex(), 'properties': attrs}
             else:
-                yield {'geom': None, 'properties': attrs}
+                reason = g.is_valid_reason()
+                print 'invalid:', reason
+                print 'geom:', g.wkt()
+                print '---'
+                yield {'geom': None, 'properties': attrs, 'reason': reason}
