@@ -4,7 +4,7 @@ import os
 
 import magic
 
-from helpers import create_table_name, to_ewkb_hex, Geometry
+from helpers import create_table_name
 from gdal import OgrFile as NativeOgrFile, SpatialRef
 
 
