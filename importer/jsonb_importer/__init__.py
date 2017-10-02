@@ -4,7 +4,7 @@ import uuid
 import os
 
 from db import Db
-from importer.ogr_helpers import OgrFile
+from importer.File import File
 
 db = Db()
 
@@ -24,7 +24,7 @@ def load_files(schema, dataset_id, version, files, name):
 
 def loop_files(files):
     for file in files:
-        file = OgrFile(file)
+        file = File(file)
         filename = os.path.basename(file.filename)
         for record in file.records():
             record['filename'] = filename
@@ -35,7 +35,7 @@ def load_files_single(schema, dataset_id, version, files, name):
     if files is None or len(files) == 0:
         print 'No files specified'
         return
-    file = OgrFile(files[0])
+    file = File(files[0])
 
     print 'Write %s files to db' % len(files)
     fields = file.fields()

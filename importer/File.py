@@ -5,7 +5,7 @@ import os
 import magic
 
 from importer.helpers import create_table_name
-from importer.gdal import OgrFile as NativeOgrFile, SpatialRef
+from importer.gdal import OgrFile, SpatialRef
 
 
 def get_encoding(filename):
@@ -53,14 +53,14 @@ def uniq(list_of_dicts, key):
     return without_duplicates
 
 
-class OgrFile(object):
+class File(object):
 
     def __init__(self, filename):
         self.org_filename = filename
         self.filename = convert_file(filename)
         self.encoding = get_encoding(self.filename)
         driver_name = get_driver(self.filename)
-        self.file = NativeOgrFile(self.filename, driver_name, self.encoding)
+        self.file = OgrFile(self.filename, driver_name, self.encoding)
         self.out_srs = SpatialRef(4326)
 
     def fields(self):
