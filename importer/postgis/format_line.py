@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from helpers import escape, DateTimeEncoder
+from importer.helpers import escape, DateTimeEncoder
 
 
 def format_line(record):

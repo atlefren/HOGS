@@ -4,7 +4,7 @@ import uuid
 import os
 
 from db import Db
-from ogr_helpers import OgrFile
+from importer.ogr_helpers import OgrFile
 
 db = Db()
 

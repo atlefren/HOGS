@@ -7,9 +7,9 @@ import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv, find_dotenv
 
-from postgis_helpers import IteratorFile
-from helpers import create_table_name
-from postgis_helpers import format_line
+from importer.postgis import IteratorFile
+from importer.postgis import format_line
+from importer.helpers import create_table_name
 
 
 load_dotenv(find_dotenv())

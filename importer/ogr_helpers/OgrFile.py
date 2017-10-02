@@ -4,8 +4,8 @@ import os
 
 import magic
 
-from helpers import create_table_name
-from gdal import OgrFile as NativeOgrFile, SpatialRef
+from importer.helpers import create_table_name
+from importer.gdal import OgrFile as NativeOgrFile, SpatialRef
 
 
 def get_encoding(filename):

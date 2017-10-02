@@ -2,7 +2,7 @@
 
 from lgdal import lgdal
 from OgrFeature import OgrFeature
-from helpers import normalize
+from importer.helpers import normalize
 
 
 class OgrLayer(object):
