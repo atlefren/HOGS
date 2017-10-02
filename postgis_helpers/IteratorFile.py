@@ -2,9 +2,6 @@
 
 import io
 import sys
-import json
-
-from helpers import escape
 
 
 class IteratorFile(io.TextIOBase):
@@ -13,10 +10,11 @@ class IteratorFile(io.TextIOBase):
         based on https://gist.github.com/jsheedy/ed81cdf18190183b3b7d
     """
 
-    def __init__(self, dataset_id, version, records):
+    def __init__(self, dataset_id, version, records, format_line):
         self._records = records
         self._dataset_id = dataset_id
         self._version = version
+        self._format_line = format_line
         self._f = io.StringIO()
         self._count = 0
 
@@ -30,10 +28,8 @@ class IteratorFile(io.TextIOBase):
             # soak up StopIteration. this block is not necessary because
             # of finally, but just to be explicit
             pass
-
         except Exception as e:
             print('uncaught exception: {}'.format(e))
-
         finally:
             self._f.seek(0)
             data = self._f.read(length)
@@ -49,17 +45,8 @@ class IteratorFile(io.TextIOBase):
         return self._get_next()
 
     def _get_next(self):
-
-        n = next(self._records)
-        geom = '\N'
-        if n['geom'] is not None:
-            geom = n['geom']
-        r = '%s\t%s\t%s\t%s' % (
-            self._dataset_id,
-            self._version,
-            geom,
-            escape(json.dumps(n['properties'], ensure_ascii=False))
-        )
-
+        record = next(self._records)
+        record['dataset_id'] = self._dataset_id
+        record['version'] = self._version
         self._count += 1
-        return unicode(r)
+        return self._format_line(record)

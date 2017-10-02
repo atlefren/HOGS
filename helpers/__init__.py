@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
 import unicodedata
+from datetime import datetime, date
+import json
 
-from geos import to_ewkb_hex
-from geom import Geometry
+from lgeos import lgeos
 
 
 def create_table_name(value):
@@ -34,3 +35,13 @@ def normalize(value):
 
 def escape(value):
     return value.replace('\\', '\\\\')
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        if isinstance(o, date):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)

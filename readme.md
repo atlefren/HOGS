@@ -44,14 +44,3 @@ OR: du whatever you like, as long as you end up with gdal/ogr with python-bindin
     source venv/bin/activate
     pip install -r requirements.txt
 
-5. upgrade db
-
-    alembic upgrade head
-
-## Alembic
-
-source venv/scripts/activate
-alembic revision -m "init database"
-alembic upgrade head
-
-

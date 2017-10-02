@@ -9,6 +9,7 @@ from dotenv import load_dotenv, find_dotenv
 
 from postgis_helpers import IteratorFile
 from helpers import create_table_name
+from postgis_helpers import format_line
 
 
 load_dotenv(find_dotenv())
@@ -30,10 +31,53 @@ class Db(object):
             port=port
         )
 
+    def check_adm_exists(self):
+        with self.conn.cursor() as cur:
+            cur.execute("""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = 'adm'
+                    AND table_name = 'datasetstore'
+                );
+            """)
+            return cur.fetchone()[0]
+
+    def create_adm_table(self):
+        with self.conn.cursor() as cur:
+            cur = self.conn.cursor()
+            cur.execute("""
+                CREATE SCHEMA adm;
+            """)
+            self.conn.commit()
+            cur.execute("""
+                CREATE TABLE adm.datasetstore (
+                    dataset_id varchar(255) not null,
+                    name varchar(255) not null,
+                    schema varchar(100) not null,
+                    version bigint not null,
+                    created timestamp WITH TIME ZONE not null,
+                    is_imported boolean not null  DEFAULT FALSE,
+                    PRIMARY KEY (dataset_id, version)
+                );
+            """)
+            self.conn.commit()
+            cur.execute("""
+                CREATE VIEW adm.datasetstore_latest AS
+                SELECT DISTINCT ON (dataset_id)
+                dataset_id, name, schema, version, created
+                FROM adm.datasetstore
+                WHERE is_imported = TRUE
+                ORDER BY dataset_id, version DESC;
+            """)
+            self.conn.commit()
+
     def check_schema_exists(self, schema_name):
         with self.conn.cursor() as cur:
             cur.execute("""
-                SELECT schema_name FROM information_schema.schemata WHERE schema_name = %s;
+                SELECT schema_name
+                FROM information_schema.schemata
+                WHERE schema_name = %s;
             """, (schema_name, ))
             return cur.fetchone() is not None
 
@@ -59,7 +103,9 @@ class Db(object):
                         version bigint,
                         geom geometry(Geometry,4326),
                         attribs jsonb,
-                        test varchar(255),
+                        valid boolean,
+                        invalid_reason varchar(255),
+                        filename varchar(255),
                         FOREIGN KEY(datasetid, version) REFERENCES adm.datasetstore(dataset_id, version)
                     );
                 """).format(
@@ -105,7 +151,10 @@ class Db(object):
     def dataset_exists(self, schema_name, dataset_id):
         with self.conn.cursor() as cur:
             cur.execute("""
-                SELECT dataset_id FROM adm.datasetstore WHERE dataset_id = %s AND schema = %s;
+                SELECT dataset_id
+                FROM adm.datasetstore
+                WHERE dataset_id = %s
+                AND schema = %s;
             """, (dataset_id, schema_name))
             exists = cur.fetchone() is not None
             return exists
@@ -123,12 +172,16 @@ class Db(object):
             sql.Identifier('geom')
         ]
 
-        return fixed + [self._create_field(field) for field in fields]
+        return fixed + [self._create_field(field) for field in fields] + [sql.Identifier('filename')]
 
     def create_dataset_view(self, schema_name, dataset_id, name, version, fields):
         with self.conn.cursor() as cur:
             sql_str = sql.SQL("""
-                    CREATE OR REPLACE VIEW {}.{} AS SELECT {} FROM {}.{} WHERE datasetid = {} AND version = {};
+                    CREATE OR REPLACE VIEW {}.{} AS
+                        SELECT {}
+                        FROM {}.{}
+                        WHERE datasetid = {}
+                        AND version = {};
                 """).format(
                     sql.Identifier(schema_name),
                     sql.Identifier(create_table_name(name)),
@@ -158,10 +211,23 @@ class Db(object):
             )
             self.conn.commit()
 
+    def mark_dataset_imported(self, schema_name, dataset_id, version):
+        with self.conn.cursor() as cur:
+            cur.execute("""
+                UPDATE adm.datasetstore
+                SET is_imported = TRUE
+                WHERE dataset_id=%(dataset_id)s
+                AND version=%(version)s;
+            """, {'dataset_id': dataset_id, 'version': version})
+            self.conn.commit()
+
     def get_dataset_version(self, schema_name, dataset_id):
         with self.conn.cursor() as cur:
             cur.execute("""
-                SELECT max(version) FROM adm.datasetstore WHERE dataset_id = %s AND schema = %s;
+                SELECT max(version)
+                FROM adm.datasetstore
+                WHERE dataset_id = %s
+                AND schema = %s;
             """, (dataset_id, schema_name))
             version = cur.fetchone()
             if version is None:
@@ -169,9 +235,9 @@ class Db(object):
             return version[0]
 
     def write_features(self, schema, dataset_id, version, properties, records):
-        columns = ('datasetid', 'version', 'geom', 'attribs')
+        columns = ('datasetid', 'version', 'geom', 'attribs', 'valid', 'invalid_reason', 'filename')
         start = datetime.datetime.now()
-        f = IteratorFile(dataset_id, version, records)
+        f = IteratorFile(dataset_id, version, records, format_line)
         with self.conn.cursor() as cur:
             cur.copy_from(f, '%s.%s' % (schema, 'datastore'), columns=columns)
         self.conn.commit()

@@ -39,3 +39,6 @@ Some reflections, and stuff learned!
 13. a charset-"error" can be due to bad input-data!
 14. wkb is faster than WKT!
 15. the attribute .is_valid on a shapely geom will tell you if a geom is valid, but how to get the reason it's invalid?
+16. for gdal ctypes: https://github.com/django/django/tree/master/django/contrib/gis/gdal
+17. for geos ctypes: https://github.com/Toblerity/Shapely/blob/master/shapely/geos.py
+18. geos C API: http://www.gdal.org/ogr__api_8h.html

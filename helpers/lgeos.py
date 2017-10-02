@@ -2,6 +2,7 @@ from ctypes import (CDLL, DEFAULT_MODE, c_char_p, c_void_p, c_int, c_size_t,
                     POINTER, pointer, string_at, CFUNCTYPE)
 from ctypes.util import find_library
 
+
 c_size_t_p = POINTER(c_size_t)
 
 

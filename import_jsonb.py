@@ -33,9 +33,8 @@ def get_files(dir_name):
 if __name__ == '__main__':
     start = datetime.datetime.now()
 
-    import_dataset('test', 'test', ['/mnt/d/code/kartverksdata/dl/160792/0235_N50_Restriksjonsomrader.sos'], 'test')
+    import_dataset('test', 'surnadal', ['/mnt/d/code/kartverksdata/dl/160792/1566_N50_Arealdekke.sos'], 'surnadal')
     '''
-
     folder = '/mnt/d/code/kartverksdata/dl/160792'
     #folder = '/mnt/d/code/kartverksdata/dl/test'
     #unzip(folder)
