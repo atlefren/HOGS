@@ -2,11 +2,14 @@
 import datetime
 import uuid
 import os
+from dotenv import load_dotenv, find_dotenv
 
-from db import Db
+from importer.postgis import JsonbDb
 from importer.File import File
 
-db = Db()
+load_dotenv(find_dotenv())
+
+db = JsonbDb(os.environ.get('DATABASE_URI', None))
 
 '''
 def load_files(schema, dataset_id, version, files, name):

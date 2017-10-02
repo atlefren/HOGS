@@ -5,7 +5,7 @@ import re
 from collections import defaultdict
 import datetime
 
-from importer.jsonb_importer import import_dataset
+from importer.import_to_jsonb import import_dataset
 
 
 def unzip(dir_name):

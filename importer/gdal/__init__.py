@@ -2,3 +2,4 @@
 
 from SpatialRef import SpatialRef
 from OgrFile import OgrFile
+from lgdal import lgdal

@@ -4,7 +4,7 @@ from ctypes import c_ubyte, byref, string_at, c_char_p, c_size_t, pointer
 import io
 
 from lgdal import lgdal
-from importer.helpers.lgeos import lgeos
+from importer.geos import lgeos
 
 from get_field_value import get_field_value
 from stdout_redirector import stdout_redirector

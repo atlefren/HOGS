@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
-import os
 import urlparse
 import datetime
 
 import psycopg2
 from psycopg2 import sql
-from dotenv import load_dotenv, find_dotenv
 
 from importer.postgis import IteratorFile
 from importer.postgis import format_line
 from importer.helpers import create_table_name
 
 
-load_dotenv(find_dotenv())
-
-
 class Db(object):
-    def __init__(self,):
-        result = urlparse.urlparse(os.environ.get('DATABASE_URI', None))
+    def __init__(self, conn_str):
+        result = urlparse.urlparse(conn_str)
         username = result.username
         password = result.password
         database = result.path[1:]

@@ -4,8 +4,6 @@ import unicodedata
 from datetime import datetime, date
 import json
 
-from lgeos import lgeos
-
 
 def create_table_name(value):
     """
