@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#from lgdal import lgdal
+from lgdal import lgdal
 from OgrFeature import OgrFeature
 from importer.helpers import normalize
 
@@ -13,23 +13,27 @@ class OgrLayer(object):
 
     @property
     def name(self):
-        pass
-        #return string_at(lgdal.OGR_L_GetName(self.ogr_layer))
+        return string_at(lgdal.OGR_L_GetName(self.ogr_layer))
 
     def features(self):
-        for feature in self.ogr_layer:
-            yield OgrFeature(feature, self.schema, self.encoding)
+        while True:
+            feature = lgdal.OGR_L_GetNextFeature(self.ogr_layer)
+            if feature is not None:
+                yield OgrFeature(feature, self.schema, self.encoding)
+            else:
+                break
 
     @property
     def schema(self):
         if self._schema is None:
 
-            layer_def = self.ogr_layer.GetLayerDefn()
+            layer_def = lgdal.OGR_L_GetLayerDefn(self.ogr_layer)
+            field_count = lgdal.OGR_FD_GetFieldCount(layer_def)
             self._schema = []
-            for index in range(layer_def.GetFieldCount()):
-                field_def = layer_def.GetFieldDefn(index)
-                field_name = field_def.GetName()
-                field_type = field_def.GetType()
+            for index in range(0, field_count):
+                field_def = lgdal.OGR_FD_GetFieldDefn(layer_def, index)
+                field_name = lgdal.OGR_Fld_GetNameRef(field_def)
+                field_type = lgdal.OGR_Fld_GetType(field_def)
 
                 try:
                     field_name = unicode(field_name.decode('utf-8'))

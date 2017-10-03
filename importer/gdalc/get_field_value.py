@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+
+from ctypes import c_int, byref
 from datetime import date, datetime, time
+from lgdal import lgdal
 
 
 def get_int(ogr_feature, field_idx, encoding):
-    return None
+    return lgdal.OGR_F_GetFieldAsInteger(ogr_feature, field_idx)
 
 
 def get_int_list(ogr_feature, field_idx, encoding):
@@ -19,7 +22,7 @@ def get_real_list(ogr_feature, field_idx, encoding):
 
 
 def get_string(ogr_feature, field_idx, encoding):
-    value = ogr_feature.GetFieldAsString(field_idx)
+    value = lgdal.OGR_F_GetFieldAsString(ogr_feature, field_idx)
     return unicode(value.decode(encoding))
 
 
@@ -48,7 +51,11 @@ def field_as_datetime(ogr_feature, field_idx):
 
 
 def get_date(ogr_feature, field_idx, encoding):
-    return None
+    res = field_as_datetime(ogr_feature, field_idx)
+    if res is None:
+        return None
+    (yy, mm, dd, hh, mn, ss) = res
+    return date(yy, mm, dd)
 
 
 def get_time(ogr_feature, field_idx, encoding):
@@ -56,7 +63,11 @@ def get_time(ogr_feature, field_idx, encoding):
 
 
 def get_datetime(ogr_feature, field_idx, encoding):
-    return None
+    res = field_as_datetime(ogr_feature, field_idx)
+    if res is None:
+        return None
+    (yy, mm, dd, hh, mn, ss) = res
+    return datetime(yy, mm, dd, hh, mn, ss)
 
 
 def get_int64(ogr_feature, field_idx, encoding):

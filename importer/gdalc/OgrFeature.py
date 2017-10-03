@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
+
 from ctypes import c_ubyte, byref, string_at, c_char_p, c_size_t, pointer
 import io
 
+from lgdal import lgdal
 from importer.geos import lgeos
 
 from get_field_value import get_field_value
 from stdout_redirector import stdout_redirector
 
 
+def wkb_size(ogr_geom):
+    return lgdal.OGR_G_WkbSize(ogr_geom)
+
+
 class OgrFeature(object):
 
     def __init__(self, ogr_feature, schema, encoding):
         self.ogr_feature = ogr_feature
-        self.ogr_geom = ogr_feature.GetGeometryRef()
+        self.ogr_geom = lgdal.OGR_F_GetGeometryRef(ogr_feature)
         self._schema = schema
         self.encoding = encoding
         self._valid = None
@@ -27,9 +33,10 @@ class OgrFeature(object):
         valid = None
         f = io.StringIO()
         with stdout_redirector(f):
-            valid = self.ogr_geom.IsValid()
+            valid = bool(lgdal.OGR_G_IsValid(self.ogr_geom))
         self._valid = valid
         self._err = f.getvalue()
+        #print self._err
         return self._valid
 
     @property
@@ -40,11 +47,19 @@ class OgrFeature(object):
 
     @property
     def wkt(self):
-        return self.ogr_geom.ExportToWkt()
+        p = c_char_p()
+        res = lgdal.OGR_G_ExportToWkt(self.ogr_geom, byref(p))
+        wkt = p.value
+        lgdal.VSIFree(p)
+        return wkt
 
     @property
     def wkb(self):
-        return self.ogr_geom.ExportToWkb()
+        size = wkb_size(self.ogr_geom)
+        buf = (c_ubyte * size)()
+        res = lgdal.OGR_G_ExportToWkb(self.ogr_geom, 0, byref(buf))
+        val = string_at(buf, size)
+        return val
 
     @property
     def ewkb_hex(self):
@@ -68,14 +83,16 @@ class OgrFeature(object):
         attrs = {}
         for field in self._schema:
             value = get_field_value(self.ogr_feature, field['index'], field['type'], self.encoding)
+            #if value is None:
+            #    print field
             attrs[field['name']] = value
         return attrs
 
     def transform(self, srs):
-        self.ogr_geom.TransformTo(srs.srs)
+        lgdal.OGR_G_TransformTo(self.ogr_geom, srs.srs)
         self._srid = srs.srid
 
     def __del__(self):
-        if self.ogr_feature:
-            self.ogr_feature.Destroy()
+        if self.ogr_feature is not None and lgdal is not None:
+            lgdal.OGR_F_Destroy(self.ogr_feature)
             self.ogr_feature = None

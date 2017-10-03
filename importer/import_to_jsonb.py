@@ -42,6 +42,10 @@ def load_files_single(schema, dataset_id, version, files, name):
 
     print 'Write %s files to db' % len(files)
     fields = file.fields()
+    '''
+    for r in loop_files(files):
+        print r
+    '''
     db.write_features(schema, dataset_id, version, fields, loop_files(files))
     db.create_dataset_view(schema, dataset_id, name, version, fields)
 

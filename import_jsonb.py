@@ -33,8 +33,8 @@ def get_files(dir_name):
 if __name__ == '__main__':
     start = datetime.datetime.now()
 
-    import_dataset('test', 'surnadal', ['/mnt/d/code/kartverksdata/dl/160792/1566_N50_Arealdekke.sos'], 'surnadal')
-    '''
+    #import_dataset('test', 'surnadal', ['/mnt/d/code/kartverksdata/dl/160792/1566_N50_Arealdekke.sos'], 'surnadal')
+
     folder = '/mnt/d/code/kartverksdata/dl/160792'
     #folder = '/mnt/d/code/kartverksdata/dl/test'
     #unzip(folder)
@@ -52,4 +52,3 @@ if __name__ == '__main__':
     elapsed = datetime.datetime.now()
     print 'Time spent importing: %s ' % (elapsed - start2)
     print 'Total time spent    : %s ' % (elapsed - start)
-    '''

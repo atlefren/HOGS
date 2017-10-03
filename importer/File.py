@@ -5,7 +5,7 @@ import os
 import magic
 
 from importer.helpers import create_table_name
-from importer.gdal import OgrFile, SpatialRef
+from importer.gdalc import OgrFile, SpatialRef
 
 
 def get_encoding(filename):

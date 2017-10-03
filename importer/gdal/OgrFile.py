@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from lgdal import lgdal
+from osgeo import ogr
 from OgrLayer import OgrLayer
 
 
@@ -9,16 +9,17 @@ class OgrFile(object):
     def __init__(self, filename, driver_name, encoding):
         self.filename = filename
         self.encoding = encoding
-        driver = lgdal.OGRGetDriverByName(driver_name)
-        self.source = lgdal.OGR_Dr_Open(driver, self.filename, bool(False))
+        driver = ogr.GetDriverByName(driver_name)
+        self.source = driver.Open(filename, 0)
 
     def layers(self):
-        num_layers = lgdal.OGR_DS_GetLayerCount(self.source)
+        num_layers = self.source.GetLayerCount()
         for i in range(0, num_layers):
-            yield OgrLayer(lgdal.OGR_DS_GetLayer(self.source, i), self.encoding)
-        self.__del__()
+            yield OgrLayer(self.source.GetLayerByIndex(i), self.encoding)
+        #self.__del__()
 
     def __del__(self):
-        if self.source is not None and lgdal is not None:
-            lgdal.OGR_DS_Destroy(self.source)
+        if self.source is not None:
+            print 'Destroy'
+            self.source.Destroy()
             self.source = None
