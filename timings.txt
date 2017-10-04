@@ -5,3 +5,4 @@ import, no unzip, jsonb, index, wkt
 import, no unzip, jsonb, index, wkb
 2:02:17.382295
 
+import, no unzip, jsonb, wkb, 7 threads

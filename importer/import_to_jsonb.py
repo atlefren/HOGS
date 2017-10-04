@@ -2,27 +2,21 @@
 import datetime
 import uuid
 import os
-from dotenv import load_dotenv, find_dotenv
+import logging
 
 from importer.postgis import JsonbDb
 from importer.File import File
 
-load_dotenv(find_dotenv())
 
-db = JsonbDb(os.environ.get('DATABASE_URI', None))
-
-'''
 def load_files(schema, dataset_id, version, files, name):
     if files is None or len(files) == 0:
-        print 'No files specified'
+        logging.warn('[%s] No files specified' % (dataset_id))
         return
     for file in files:
         file = OgrFile(file)
         fields = file.fields()
-        # print 'Write %s features to db' % file.num_features
         db.write_features(schema, dataset_id, version, fields, file.records())
     db.create_dataset_view(schema, dataset_id, name, version, fields)
-'''
 
 
 def loop_files(files):
@@ -34,45 +28,40 @@ def loop_files(files):
             yield record
 
 
-def load_files_single(schema, dataset_id, version, files, name):
+def load_files_single(db, schema, dataset_id, version, files, name):
     if files is None or len(files) == 0:
-        print 'No files specified'
+        logging.warn('[%s] No files specified' % (dataset_id))
         return
     file = File(files[0])
-
-    print 'Write %s files to db' % len(files)
+    logging.info('[%s] Write %s files to db' % (dataset_id, len(files)))
     fields = file.fields()
-    '''
-    for r in loop_files(files):
-        print r
-    '''
-    db.write_features(schema, dataset_id, version, fields, loop_files(files))
-    db.create_dataset_view(schema, dataset_id, name, version, fields)
+
+    num_records = db.write_features(schema, dataset_id, version, fields, loop_files(files))
+    logging.info('[%s] Number of rows copied : %s' % (dataset_id, num_records))
+    return fields
 
 
-def import_dataset(schema, name, files, dataset_id=None, append=False):
-    if not db.check_adm_exists():
-        print 'Create adm schema'
-        db.create_adm_table()
-
-    if not db.check_schema_exists(schema):
-        print 'Create schema %s' % schema
-        db.create_schema(schema)
+def import_dataset(schema, name, files, dataset_id=None, append=False, database=None):
+    db = JsonbDb(database)
 
     version = 1
     created = datetime.datetime.now()
     if dataset_id is None or not db.dataset_exists(schema, dataset_id):
         if dataset_id is None:
             dataset_id = str(uuid.uuid4())
-        print 'Create dataset %s.%s' % (schema, dataset_id)
+        logging.info('[%s] Create dataset %s.%s' % (dataset_id, schema, dataset_id))
         version = 1
     elif append:
         version = db.get_dataset_version(schema, dataset_id)
-        print 'Append to dataset %s.%s version %s' % (schema, dataset_id, version)
+        logging.info('[%s] Append to dataset %s.%s version %s' % (dataset_id, schema, dataset_id, version))
     else:
         version = db.get_dataset_version(schema, dataset_id) + 1
-        print 'Update dataset %s.%s to version %s' % (schema, dataset_id, version)
+        logging.info('[%s] Update dataset %s.%s to version %s' % (dataset_id, schema, dataset_id, version))
 
     db.create_dataset(schema, dataset_id, name, version, created)
-    load_files_single(schema, dataset_id, version, files, name)
+    start = datetime.datetime.now()
+    fields = load_files_single(db, schema, dataset_id, version, files, name)
+    elapsed = datetime.datetime.now()
+    logging.info('[%s] Time spent on copy    : %s' % (dataset_id, elapsed - start))
+    db.create_dataset_view(schema, dataset_id, name, version, fields)
     db.mark_dataset_imported(schema, dataset_id, version)

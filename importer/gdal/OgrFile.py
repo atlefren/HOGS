@@ -16,10 +16,12 @@ class OgrFile(object):
         num_layers = self.source.GetLayerCount()
         for i in range(0, num_layers):
             yield OgrLayer(self.source.GetLayerByIndex(i), self.encoding)
-        #self.__del__()
+
+    @property
+    def num_features(self):
+        return sum([layer.num_features for layer in self.layers()])
 
     def __del__(self):
         if self.source is not None:
-            print 'Destroy'
             self.source.Destroy()
             self.source = None

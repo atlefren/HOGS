@@ -30,6 +30,7 @@ class IteratorFile(io.TextIOBase):
             pass
         except Exception as e:
             print('uncaught exception: {}'.format(e))
+            raise exception
         finally:
             self._f.seek(0)
             data = self._f.read(length)

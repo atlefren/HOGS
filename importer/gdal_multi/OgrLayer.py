@@ -24,6 +24,15 @@ class OgrLayer(object):
         for feature in self.ogr_layer:
             yield OgrFeature(feature, self.schema, self.encoding)
 
+    def get_records(self, start, num):
+        self.ogr_layer.SetNextByIndex(start)
+        c = 0
+        while c < num:
+            f = next(self.ogr_layer)
+            f = OgrFeature(f, self.schema, self.encoding)
+            yield f
+            c += 1
+
     @property
     def schema(self):
         if self._schema is None:

@@ -10,6 +10,10 @@ def format_line(record):
     is_valid = 'true' if record['valid'] else 'false'
     invalid_reason = '\N'
 
+    filename = record.get('filename', '\N')
+    if filename == '':
+        filename = '\N'
+
     if record['valid']:
         geom = record['geom']
         attributes = escape(json.dumps(
@@ -20,13 +24,14 @@ def format_line(record):
     else:
         invalid_reason = record['reason']
 
+
     line = '%s\t%s\t%s\t%s\t%s\t%s\t%s' % (
         record.get('dataset_id', '\N'),
-        record.get('version', '\N'),
+        record.get('version', '10000'),
         geom,
         attributes,
+        filename,
         is_valid,
-        invalid_reason,
-        record.get('filename', '\N')
+        invalid_reason
     )
     return unicode(line)

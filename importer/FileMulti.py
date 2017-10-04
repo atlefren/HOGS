@@ -5,7 +5,7 @@ import os
 import magic
 
 from importer.helpers import create_table_name
-from importer.gdal import OgrFile, SpatialRef
+from importer.gdal_multi import OgrFile, SpatialRef
 
 
 def get_encoding(filename):
@@ -67,11 +67,19 @@ class File(object):
     def num_features(self):
         return self.file.num_features
 
+    @property
+    def layers(self):
+        return self.file.layers
+
     def fields(self):
         fields = []
         for layer in self.file.layers():
             fields += layer.schema
         return uniq(fields, 'name')
+
+    def get_records(self, start, num):
+        #print 'get records from file', self
+        return self.file.get_records(start, num)
 
     def records(self):
         for layer in self.file.layers():

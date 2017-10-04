@@ -3,6 +3,7 @@ import re
 import unicodedata
 from datetime import datetime, date
 import json
+from paralell import paralellize
 
 
 def create_table_name(value):
