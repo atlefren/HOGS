@@ -18,6 +18,7 @@ class Db(object):
         database = result.path[1:]
         hostname = result.hostname
         port = result.port
+        self.conn_str = conn_str
         self.conn = psycopg2.connect(
             database=database,
             user=username,

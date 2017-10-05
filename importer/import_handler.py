@@ -5,7 +5,7 @@ import logging
 
 from import_to_jsonb import import_dataset as import_jsonb
 
-from import_to_jsonb_paralell import import_datasets as import_jsonb_p
+from import_to_jsonb_paralell2 import import_datasets as import_jsonb_p
 
 from importer.postgis import JsonbDb
 # serial 22 s
@@ -51,7 +51,7 @@ def do_import(config):
         schemas = list(set([d['schema'] for d in config['datasets']]))
         for schema in schemas:
             if not db.check_schema_exists(schema):
-                logging.info('[GENERAL] Create schema %s' % (schema))
+                logging.info('[DEFAULT] Create schema %s' % (schema))
                 db.create_schema(schema)
 
         p.map(import_dataset_jsonb, config['datasets'])
@@ -76,8 +76,8 @@ def do_import_paralell(config):
     #    num_threads = num_datasets
 
     logging.info('[DEFAULT] Use %s threads' % num_threads)
-    for d in config['datasets']:
-        d['database'] = config['database']
+    #for d in config['datasets']:
+    #    #d['database'] = config['database']
 
     #p = Pool(num_threads)
     if config['data_layout'] == 'jsonb':
@@ -89,7 +89,7 @@ def do_import_paralell(config):
         schemas = list(set([d['schema'] for d in config['datasets']]))
         for schema in schemas:
             if not db.check_schema_exists(schema):
-                logging.info('[GENERAL] Create schema %s' % (schema))
+                logging.info('[DEFAULT] Create schema %s' % (schema))
                 db.create_schema(schema)
 
         # old way

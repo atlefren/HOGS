@@ -73,7 +73,7 @@ class OgrFile(object):
         self._driver = ogr.GetDriverByName(str(driver_name))
         self._num_features = None
         self._layers = None
-        self.features = None
+        self._features = None
         self._source = None
 
     def init(self):
@@ -101,13 +101,16 @@ class OgrFile(object):
             self._num_features = sum([layer.num_features for layer in self.layers])
         return self._num_features
 
-    def get_records(self, start, num):
-
-        if self.features is None:
-            self.features = []
+    @property
+    def features(self):
+        if self._features is None:
+            self._features = []
             for layer in self.layers:
                 for feature in layer.features():
-                    self.features.append(feature)
+                    self._features.append(feature)
+        return self._features
+
+    def get_records(self, start, num):
 
         features = self.features[start:]
         if len(features) >= num:
