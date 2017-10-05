@@ -10,6 +10,19 @@ from importer.postgis import JsonbDb
 logging.basicConfig(level=logging.DEBUG)
 
 
+def init_db_jsonb(config):
+    db = JsonbDb(config['database'])
+    if not db.check_adm_exists():
+        logging.info('[DEFAULT] Create adm schema')
+        db.create_adm_table()
+    schemas = list(set([d['schema'] for d in config['datasets']]))
+    for schema in schemas:
+        if not db.check_schema_exists(schema):
+            logging.info('[DEFAULT] Create schema %s' % (schema))
+            db.create_schema(schema)
+    return db
+
+
 def do_import_paralell(config):
     start = datetime.datetime.now()
 
@@ -20,17 +33,9 @@ def do_import_paralell(config):
     logging.info('[DEFAULT] Import %s datasets' % num_datasets)
     logging.info('[DEFAULT] Use %s threads' % num_threads)
 
-    if config['data_layout'] == 'jsonb':
-        db = JsonbDb(config['database'])
-        if not db.check_adm_exists():
-            logging.info('[DEFAULT] Create adm schema')
-            db.create_adm_table()
-        schemas = list(set([d['schema'] for d in config['datasets']]))
-        for schema in schemas:
-            if not db.check_schema_exists(schema):
-                logging.info('[DEFAULT] Create schema %s' % (schema))
-                db.create_schema(schema)
 
+    if config['data_layout'] == 'jsonb':
+        db = init_db_jsonb(config)
         import_jsonb(config['datasets'], num_threads=num_threads, database=db)
 
     else:

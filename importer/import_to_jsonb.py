@@ -34,8 +34,10 @@ def loop_files(files, num_items, out_srs, dataset):
 
 def handle_dataset(worker_id, dataset, num_items, database, out_srs):
 
+    logging.info('[%s] Start batch to %s.%s' % (worker_id, dataset['schema'], dataset['dataset_id']))
     fields = OgrFile(dataset['files'][0], dataset['driver'], dataset['dataset_id']).fields
     files = deque(dataset['files'])
+
     records = loop_files(files, num_items, out_srs, dataset)
 
     num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], fields, records)
