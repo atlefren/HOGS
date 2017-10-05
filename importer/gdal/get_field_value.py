@@ -2,12 +2,16 @@
 from datetime import date, datetime, time
 
 
+class MissingDatatypeException(Exception):
+    pass
+
+
 def get_int(ogr_feature, field_idx, encoding):
     return ogr_feature.GetFieldAsInteger(field_idx)
 
 
 def get_int_list(ogr_feature, field_idx, encoding):
-    print 'int list'
+    raise MissingDatatypeException('int list')
     return None
 
 
@@ -16,7 +20,7 @@ def get_real(ogr_feature, field_idx, encoding):
 
 
 def get_real_list(ogr_feature, field_idx, encoding):
-    print 'real list'
+    raise MissingDatatypeException('real list')
     return None
 
 
@@ -29,17 +33,17 @@ def get_string(ogr_feature, field_idx, encoding):
 
 
 def get_string_list(ogr_feature, field_idx, encoding):
-    print 'string list'
+    raise MissingDatatypeException('string list')
     return None
 
 
 def get_wide_string(ogr_feature, field_idx, encoding):
-    print 'wide string'
+    raise MissingDatatypeException('wide string')
     return None
 
 
 def get_wide_string_list(ogr_feature, field_idx, encoding):
-    print 'wide string list'
+    raise MissingDatatypeException('wide string list')
     return None
 
 
@@ -66,7 +70,7 @@ def get_date(ogr_feature, field_idx, encoding):
 
 
 def get_time(ogr_feature, field_idx, encoding):
-    print 'time'
+    raise MissingDatatypeException('time')
     return None
 
 
@@ -86,7 +90,7 @@ def get_int64(ogr_feature, field_idx, encoding):
 
 
 def get_int64_list(ogr_feature, field_idx, encoding):
-    print 'int64 list'
+    raise MissingDatatypeException('int64 list')
     return None
 
 
@@ -108,4 +112,3 @@ def get_field_value(ogr_feature, field_idx, field_type, encoding):
         13: get_int64_list
     }
     return types[field_type](ogr_feature, field_idx, encoding)
-

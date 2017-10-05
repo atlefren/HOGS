@@ -3,55 +3,58 @@ import datetime
 import uuid
 import os
 import logging
+from multiprocessing import Queue, current_process, Pool
+from collections import deque
 
+from importer.gdal import SpatialRef
+from importer.gdal.OgrFile import OgrFile
 from importer.postgis import JsonbDb
-from importer.FileMulti import File
 
 
-def loop_single(file):
-    filename = os.path.basename(file.filename)
-    for record in file.records():
-        record['filename'] = filename
-        yield record
+def worker(input_queue, output_queue, func, num_items, conn_str, out_srs):
+    worker_id = current_process().name
+    database = JsonbDb(conn_str)
+    while True:
+        item = input_queue.get(True)
+        res = func(worker_id, item, num_items, database, out_srs)
+        output_queue.put(res)
 
 
-def load_files(db, schema, dataset_id, version, files, name):
-    if files is None or len(files) == 0:
-        logging.warn('[%s] No files specified' % (dataset_id))
-        return
-    for file in files:
-        print file
-        file = File(file)
-        fields = file.fields()
-        db.write_features(schema, dataset_id, version, fields, loop_single(file))
-    return fields
+def loop_files(files, num_items, out_srs, dataset):
+    handled_items = 0
+    while handled_items < num_items:
+        try:
+            file = OgrFile(files.popleft(), dataset['driver'], dataset['dataset_id'])
+            for feature in file.features:
+                handled_items += 1
+                yield feature.to_db(out_srs)
+        except IndexError:
+            break
 
 
-def loop_files(files):
-    for file in files:
-        file = File(file)
-        filename = os.path.basename(file.filename)
-        for record in file.records():
-            record['filename'] = filename
-            yield record
+def handle_dataset(worker_id, dataset, num_items, database, out_srs):
+
+    fields = OgrFile(dataset['files'][0], dataset['driver'], dataset['dataset_id']).fields
+    files = deque(dataset['files'])
+    records = loop_files(files, num_items, out_srs, dataset)
+
+    num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], fields, records)
+    logging.info('[%s] Copied %s records to %s.%s' % (worker_id, num_records, dataset['schema'], dataset['dataset_id']))
+
+    dataset['files'] = list(files)
+    if dataset.get('num_handled', None) is None:
+        dataset['num_handled'] = 0
+    dataset['num_handled'] += num_records
+
+    return dataset
 
 
-def load_files_single(db, schema, dataset_id, version, files, name):
-    if files is None or len(files) == 0:
-        logging.warn('[%s] No files specified' % (dataset_id))
-        return
-    file = File(files[0])
-    logging.info('[%s] Write %s files to db' % (dataset_id, len(files)))
-    fields = file.fields()
-    #print 'write!'
-    num_records = db.write_features(schema, dataset_id, version, fields, loop_files(files))
-    #print 'written'
-    logging.info('[%s] Number of rows copied : %s' % (dataset_id, num_records))
-    return fields
+def prepare_database_for_dataset(db, dataset):
+    append = not dataset.get('new_version', True)
 
-
-def import_dataset(schema, name, files, dataset_id=None, append=False, database=None):
-    db = JsonbDb(database)
+    schema = dataset['schema']
+    name = dataset['dataset_name'],
+    dataset_id = dataset.get('dataset_id', None)
 
     version = 1
     created = datetime.datetime.now()
@@ -68,9 +71,37 @@ def import_dataset(schema, name, files, dataset_id=None, append=False, database=
         logging.info('[%s] Update dataset %s.%s to version %s' % (dataset_id, schema, dataset_id, version))
 
     db.create_dataset(schema, dataset_id, name, version, created)
+    dataset['version'] = version
+    dataset['schema'] = schema
+    return dataset
+
+
+def mark_done(dataset, database):
+    database.mark_dataset_imported(dataset['schema'], dataset['dataset_id'], dataset['version'])
+
+
+def import_datasets(datasets, num_threads=1, database=None, out_srid=4326, num_items=100000):
+
+    out_srs = SpatialRef(out_srid)
     start = datetime.datetime.now()
-    fields = load_files_single(db, schema, dataset_id, version, files, name)
-    elapsed = datetime.datetime.now()
-    logging.info('[%s] Time spent on copy    : %s' % (dataset_id, elapsed - start))
-    db.create_dataset_view(schema, dataset_id, name, version, fields)
-    db.mark_dataset_imported(schema, dataset_id, version)
+    for dataset in datasets:
+        dataset = prepare_database_for_dataset(database, dataset)
+
+    input_queue = Queue()
+    output_queue = Queue()
+
+    pool = Pool(num_threads, worker, (input_queue, output_queue, handle_dataset, num_items, database.conn_str, out_srs))
+
+    for dataset in datasets:
+        input_queue.put(dataset)
+
+    completed = []
+    while len(datasets) > len(completed):
+        dataset = output_queue.get()
+
+        if len(dataset['files']) > 0:
+            input_queue.put(dataset)
+        else:
+            mark_done(dataset, database)
+            completed.append(dataset)
+            logging.info('[%s] Imported %s records to %s.%s (version %s)' % (dataset['dataset_id'], dataset['num_handled'], dataset['schema'], dataset['dataset_id'], dataset['version']))
