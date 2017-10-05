@@ -3,7 +3,7 @@ from multiprocessing import Pool
 import datetime
 import logging
 
-from import_to_jsonb import import_dataset as import_jsonb
+from import_to_jsonb import import_datasets as import_jsonb
 from importer.postgis import JsonbDb
 
 

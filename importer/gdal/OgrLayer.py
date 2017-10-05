@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#from lgdal import lgdal
 from OgrFeature import OgrFeature
 from importer.helpers import normalize
 
