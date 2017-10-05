@@ -8,27 +8,18 @@
             "schema": "n50",
             "driver": "SOSI",
             "files": [
-                "/mnt/d/data/n50/arealdekke/0101_N50_Arealdekke.sos", 
-                "/mnt/d/data/n50/arealdekke/0104_N50_Arealdekke.sos", 
-                "/mnt/d/data/n50/arealdekke/0105_N50_Arealdekke.sos"
+                "/mnt/d/data/n50/administrativeomrader/2020_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2021_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2022_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2023_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2024_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2025_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2027_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2028_N50_AdministrativeOmrader.sos", 
+                "/mnt/d/data/n50/administrativeomrader/2030_N50_AdministrativeOmrader.sos"
             ],
             "dataset_id": "arealdekke",
             "dataset_name": "Arealdekke"
-        },
-        {
-            "new_version": true,
-            "schema": "n50",
-            "driver": "SOSI",
-            "files": [
-                "/mnt/d/data/n50/bygningeroganlegg/2023_N50_BygningerOgAnlegg.sos", 
-                "/mnt/d/data/n50/bygningeroganlegg/2024_N50_BygningerOgAnlegg.sos", 
-                "/mnt/d/data/n50/bygningeroganlegg/2025_N50_BygningerOgAnlegg.sos", 
-                "/mnt/d/data/n50/bygningeroganlegg/2027_N50_BygningerOgAnlegg.sos", 
-                "/mnt/d/data/n50/bygningeroganlegg/2028_N50_BygningerOgAnlegg.sos", 
-                "/mnt/d/data/n50/bygningeroganlegg/2030_N50_BygningerOgAnlegg.sos"
-            ],
-            "dataset_id": "bygningeroganlegg",
-            "dataset_name": "Bygninger og anlegg"
         }
     ]
 }

@@ -75,6 +75,21 @@ class OgrFeature(object):
         self.ogr_geom.TransformTo(srs.srs)
         self._srid = srs.srid
 
+    def to_db(self, out_srs):
+        if not self.geom_valid:
+            return {
+                'valid': False,
+                'geom': self.wkt,
+                'reason': self.invalid_reason
+            }
+        else:
+            self.transform(out_srs)
+            return {
+                'valid': True,
+                'geom': self.ewkb_hex,
+                'attributes': self.attributes
+            }
+
     def __del__(self):
         if self.ogr_feature:
             self.ogr_feature.Destroy()

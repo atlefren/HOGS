@@ -6,3 +6,17 @@ import, no unzip, jsonb, index, wkb
 2:02:17.382295
 
 import, no unzip, jsonb, wkb, 7 threads
+
+
+
+
+INFO:root:[DEFAULT] Import 1 datasets
+INFO:root:[DEFAULT] Use 1 threads
+INFO:root:[DEFAULT] Create adm schema
+INFO:root:[GENERAL] Create schema n50
+INFO:root:[administrativeomrader] Create dataset n50.administrativeomrader
+INFO:root:[administrativeomrader] Write 428 files to db
+INFO:root:[administrativeomrader] Number of rows copied : 4806
+INFO:root:[administrativeomrader] Time spent on copy    : 0:00:28.442128
+INFO:root:[DEFAULT] Time spent importing: 0:00:28.629536
+

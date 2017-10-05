@@ -33,7 +33,7 @@ Some reflections, and stuff learned!
         geos.lgeos.GEOSSetSRID(shape._geom, 4326)
         return shape.wkb_hex
 
-10. remember to scal all layers in an ogr source!
+10. remember to select all layers in an ogr source!
 11. iterators are neat!
 12. json.dumps by defaults prints utf-data as escaped stuff use json.dumps(data, ensure_ascii=False) to get utf-8 strings in json
 13. a charset-"error" can be due to bad input-data!

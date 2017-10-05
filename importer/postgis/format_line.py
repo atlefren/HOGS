@@ -22,16 +22,15 @@ def format_line(record):
             cls=DateTimeEncoder
         ))
     else:
-        invalid_reason = record['reason']
+        invalid_reason = escape(record['reason'])
 
-
-    line = '%s\t%s\t%s\t%s\t%s\t%s\t%s' % (
+    line = '%s\t%s\t%s\t%s\t%s\t%s' % (
         record.get('dataset_id', '\N'),
         record.get('version', '10000'),
         geom,
         attributes,
         filename,
-        is_valid,
-        invalid_reason
+        is_valid
     )
+
     return unicode(line)

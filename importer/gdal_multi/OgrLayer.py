@@ -10,22 +10,25 @@ class OgrLayer(object):
         self.ogr_layer = ogr_layer
         self._schema = None
         self.encoding = encoding
+        self._count = None
 
     @property
     def name(self):
-        pass
-        #return string_at(lgdal.OGR_L_GetName(self.ogr_layer))
+        return self.ogr_layer.GetName()
 
     @property
     def num_features(self):
-        return self.ogr_layer.GetFeatureCount()
+        if self._count is None:
+            self._count = self.ogr_layer.GetFeatureCount()
+            self.ogr_layer.ResetReading()
+        return self._count
 
     def features(self):
         for feature in self.ogr_layer:
             yield OgrFeature(feature, self.schema, self.encoding)
 
     def get_records(self, start, num):
-        self.ogr_layer.SetNextByIndex(start)
+        self.ogr_layer.SetNextByIndex(start - 1)
         c = 0
         while c < num:
             f = next(self.ogr_layer)

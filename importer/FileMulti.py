@@ -57,11 +57,29 @@ class File(object):
 
     def __init__(self, filename):
         self.org_filename = filename
-        self.filename = convert_file(filename)
-        self.encoding = get_encoding(self.filename)
-        driver_name = get_driver(self.filename)
-        self.file = OgrFile(self.filename, driver_name, self.encoding)
+        self._filename = None
+        self._encoding = None
+        self._file = None
         self.out_srs = SpatialRef(4326)
+
+    @property
+    def file(self):
+        if self._file is None:
+            driver_name = get_driver(self.filename)
+            self._file = OgrFile(self.filename, driver_name, self.encoding)
+        return self._file
+
+    @property
+    def filename(self):
+        if self._filename is None:
+            self._filename = convert_file(self.org_filename)
+        return self._filename
+
+    @property
+    def encoding(self):
+        if self._encoding is None:
+            self._encoding = get_encoding(self.filename)
+        return self._encoding
 
     @property
     def num_features(self):
@@ -73,16 +91,15 @@ class File(object):
 
     def fields(self):
         fields = []
-        for layer in self.file.layers():
+        for layer in self.layers:
             fields += layer.schema
         return uniq(fields, 'name')
 
     def get_records(self, start, num):
-        #print 'get records from file', self
         return self.file.get_records(start, num)
 
     def records(self):
-        for layer in self.file.layers():
+        for layer in self.layers:
             for feature in layer.features():
                 if not feature.geom_valid:
                     yield {

@@ -36,7 +36,7 @@ files3 = [
 ]
 
 datasets = [
-    PickalableDataset('arealdekke1', 1, files3)
+    PickalableDataset('arealdekke1', 1, "1", files3)
 ]
 
 
@@ -45,7 +45,6 @@ batch_size = 5
 batches = []
 for dataset in datasets:
     num_batches = int(math.ceil(float(dataset.num_features) / float(batch_size)))
-    #print dataset, dataset.num_features, num_batches
     batches += [{'ds': dataset, 'start': i * batch_size, 'num': batch_size} for i in range(0, num_batches)]
 
 
@@ -63,7 +62,7 @@ def handle_task(q):
             elem = q.get()
             records = elem['ds'].get_records(elem['start'], elem['num'])
             for r in records:
-                print pid, r.attributes['name']
+                print pid, r['attributes']['name']
             return
         except Exception:
             continue
@@ -80,15 +79,14 @@ def get_pool(input_queue):
         processes.append(p)
     return processes
 
-print len(batches)
 
 pool = get_pool(q)
 
 for p in pool:
     p.join()
 
-print q.empty()
 
-#for r in ds.get_records(6, 6):
-#    print r.attributes['name']
+
+#for r in datasets[0].get_records(0, 12):
+#    print r['attributes']['name']
 

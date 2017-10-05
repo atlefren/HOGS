@@ -5,18 +5,26 @@ import os
 import logging
 
 from importer.postgis import JsonbDb
-from importer.File import File
+from importer.FileMulti import File
 
 
-def load_files(schema, dataset_id, version, files, name):
+def loop_single(file):
+    filename = os.path.basename(file.filename)
+    for record in file.records():
+        record['filename'] = filename
+        yield record
+
+
+def load_files(db, schema, dataset_id, version, files, name):
     if files is None or len(files) == 0:
         logging.warn('[%s] No files specified' % (dataset_id))
         return
     for file in files:
-        file = OgrFile(file)
+        print file
+        file = File(file)
         fields = file.fields()
-        db.write_features(schema, dataset_id, version, fields, file.records())
-    db.create_dataset_view(schema, dataset_id, name, version, fields)
+        db.write_features(schema, dataset_id, version, fields, loop_single(file))
+    return fields
 
 
 def loop_files(files):
@@ -35,8 +43,9 @@ def load_files_single(db, schema, dataset_id, version, files, name):
     file = File(files[0])
     logging.info('[%s] Write %s files to db' % (dataset_id, len(files)))
     fields = file.fields()
-
+    #print 'write!'
     num_records = db.write_features(schema, dataset_id, version, fields, loop_files(files))
+    #print 'written'
     logging.info('[%s] Number of rows copied : %s' % (dataset_id, num_records))
     return fields
 
