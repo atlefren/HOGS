@@ -2,25 +2,41 @@
 import os
 from osgeo import ogr
 import magic
+from chardet.universaldetector import UniversalDetector
 
 from OgrLayer import OgrLayer
 from importer.helpers import create_table_name
 
 
 def get_encoding(filename):
+    if filename.endswith('.shp'):
+        cpg = filename.replace('.shp', '.cpg')
+        if os.path.isfile(cpg):
+            return open(cpg).read()
+        else:
+            return 'latin-1'
+
+    detector = UniversalDetector()
+    with open(filename) as f:
+        for line in f.readlines():
+            detector.feed(line)
+            if detector.done:
+                break
+        if detector.result:
+            return detector.result.get('encoding')
     blob = open(filename).read()
     m = magic.Magic(mime_encoding=True)
     encoding = m.from_buffer(blob)
     return encoding
 
 
-def convert_file(filename):
+def convert_file(filename, encoding):
     name, file_extension = os.path.splitext(filename)
     base = os.path.basename(filename)
     if file_extension.lower() != '.sos':
-        return filename
-    if get_encoding(filename) != 'utf-8':
-        return filename
+        return filename, encoding
+    if encoding.lower() != 'utf-8' and encoding.lower() != 'utf-8-sig':
+        return filename, encoding
 
     isopath = os.path.join(os.path.dirname(filename), 'iso88591')
     if not os.path.exists(isopath):
@@ -28,8 +44,8 @@ def convert_file(filename):
     new_filename = os.path.join(isopath, base)
     with open(filename, 'r') as infile:
         with open(new_filename, 'wb') as outfile:
-            outfile.write(unicode(infile.read(), 'utf-8-sig').encode('latin-1', 'replace'))
-            return new_filename
+            outfile.write(unicode(infile.read(), encoding).encode('latin-1', 'replace'))
+            return new_filename, 'latin-1'
 
 
 def uniq(list_of_dicts, key):
@@ -59,8 +75,8 @@ class OgrFile(object):
     @property
     def source(self):
         if self._source is None:
-            filename = convert_file(self.filename)
-            self.encoding = get_encoding(filename)
+            self.encoding = get_encoding(self.filename)
+            filename, self.encoding = convert_file(self.filename, self.encoding)
             self._source = self._driver.Open(filename, 0)
         return self._source
 

@@ -1,0 +1,19 @@
+{
+    "database": "postgres://dvh2:pass@localhost:5432/dvh2",
+    "data_layout": "tables",
+    "threads": 7,
+    "datasets": [
+        {
+            "files": [
+                "/mnt/d/data/osm-building-no/gis.osm_buildings_a_free_1.shp"
+            ], 
+            "new_version": true, 
+            "driver": "ESRI Shapefile", 
+            "dataset_id": "osm_buildings_no", 
+            "dataset_name": "OSM Buildings", 
+            "schema": "osm"
+        }
+    ]
+}
+
+

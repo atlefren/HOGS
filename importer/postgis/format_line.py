@@ -14,7 +14,7 @@ def get_line_formatter(columns):
             if column in record:
                 value = record[column]
             else:
-                value = record['attribs'].get(column, None)
+                value = record.get('attribs', {}).get(column, None)
             if value is None or value == '':
                 data.append('\N')
             elif isinstance(value, dict):

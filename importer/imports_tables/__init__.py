@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 import datetime
+from functools import partial
+from multiprocessing import Pool
 
 from importer.gdal import SpatialRef
 from importer.gdal.OgrFile import OgrFile
@@ -11,6 +13,15 @@ from prepare import prepare_database_for_dataset
 def import_serial(datasets, database, out_srid):
     for dataset in datasets:
         import_single_dataset(database.conn_str, out_srid, dataset)
+
+
+def import_paralell_by_dataset(datasets, num_threads=1, database=None, out_srid=4326, num_items=100000):
+    len_datasets = len(datasets)
+    if num_threads > len_datasets:
+        num_threads = len_datasets
+
+    p = Pool(num_threads)
+    p.map(partial(import_single_dataset, database.conn_str, out_srid), datasets)
 
 
 def get_iterator(dataset, out_srs):
@@ -33,6 +44,10 @@ def import_single_dataset(conn_str, out_srid, dataset):
     dataset_version = dataset['version']
 
     iterator = get_iterator(dataset, out_srs)
+    #for i in iterator:
+    #    print i
+
+
     num_records = database.write_features(schema_name, dataset_id, dataset_version, fields, iterator)
 
     database.move_table(schema_name, dataset_id, dataset_version)

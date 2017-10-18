@@ -73,7 +73,7 @@ class TableDb(BaseDb):
         )
 
     def write_features(self, schema, dataset_id, version, fields, records):
-        columns = [field['normalized'] for field in fields] + ['geom', 'valid', 'filename']
+        columns = [field['normalized'] for field in fields] + ['geom', 'valid', 'invalid_reason', 'filename']
         f = IteratorFile(records, get_line_formatter(columns))
         import_table_name = self._get_import_table_name(schema, dataset_id, version)
         with self.conn.cursor() as cur:

@@ -26,7 +26,11 @@ def get_real_list(ogr_feature, field_idx, encoding):
 
 def get_string(ogr_feature, field_idx, encoding):
     value = ogr_feature.GetFieldAsString(field_idx)
-    s = unicode(value.decode(encoding))
+    try:
+        s = unicode(value.decode(encoding))
+    except LookupError:
+        s = unicode(value)
+        return s
     if s == u'':
         return None
     return s

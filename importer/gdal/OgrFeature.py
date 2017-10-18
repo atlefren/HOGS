@@ -83,8 +83,8 @@ class OgrFeature(object):
         if not self.geom_valid:
             data = {
                 'valid': False,
-                'geom': self.wkt,
-                'reason': self.invalid_reason
+                'err_geom': self.wkt,
+                'invalid_reason': self.invalid_reason
             }
         else:
             self.transform(out_srs)
