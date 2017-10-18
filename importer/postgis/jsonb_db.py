@@ -4,40 +4,15 @@ import datetime
 
 import psycopg2
 from psycopg2 import sql
-
+from base_db import BaseDb
 from importer.postgis import IteratorFile
 from importer.postgis import format_line
 from importer.helpers import create_table_name
 
 
-class Db(object):
+class JsonbDb(BaseDb):
     def __init__(self, conn_str):
-        result = urlparse.urlparse(conn_str)
-        username = result.username
-        password = result.password
-        database = result.path[1:]
-        hostname = result.hostname
-        port = result.port
-        self.conn_str = conn_str
-        self.conn = psycopg2.connect(
-            database=database,
-            user=username,
-            password=password,
-            host=hostname,
-            port=port
-        )
-
-    def check_adm_exists(self):
-        with self.conn.cursor() as cur:
-            cur.execute("""
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = 'adm'
-                    AND table_name = 'datasetstore'
-                );
-            """)
-            return cur.fetchone()[0]
+        super(JsonbDb, self).__init__(conn_str)
 
     def create_adm_table(self):
         with self.conn.cursor() as cur:
@@ -67,15 +42,19 @@ class Db(object):
                 ORDER BY dataset_id, version DESC;
             """)
             self.conn.commit()
-
-    def check_schema_exists(self, schema_name):
-        with self.conn.cursor() as cur:
             cur.execute("""
-                SELECT schema_name
-                FROM information_schema.schemata
-                WHERE schema_name = %s;
-            """, (schema_name, ))
-            return cur.fetchone() is not None
+                CREATE TABLE adm.schema (
+                    dataset_id varchar(255) not null,
+                    schema varchar(255) not null,
+                    version bigint not null,
+                    column_name_original varchar(255) not null,
+                    column_name varchar(255) not null,
+                    column_type varchar(255) not null,
+                    PRIMARY KEY (dataset_id, version, column_name),
+                    FOREIGN KEY(dataset_id, version) REFERENCES adm.datasetstore(dataset_id, version)
+                )
+            """)
+            self.conn.commit()
 
     def create_schema(self, schema_name):
         if self.check_schema_exists(schema_name):
@@ -192,6 +171,44 @@ class Db(object):
             )
             self.conn.commit()
 
+    def write_schema_table(self, schema_name, dataset_id, version, fields):
+
+        data = []
+        for field in fields:
+            data.append({
+                'dataset_id': dataset_id,
+                'schema':  schema_name,
+                'version':  version,
+                'schema':  schema_name,
+                'column_name': field['normalized'],
+                'column_name_original':  field['name'],
+                'column_type': field['pg_type']
+            })
+
+        with self.conn.cursor() as cur:
+            sql = """
+                INSERT INTO
+                    adm.schema (
+                        dataset_id,
+                        schema,
+                        version,
+                        column_name,
+                        column_name_original,
+                        column_type
+                    )
+                VALUES
+                    (
+                        %(dataset_id)s,
+                        %(schema)s,
+                        %(version)s,
+                        %(column_name)s,
+                        %(column_name_original)s,
+                        %(column_type)s
+                    )
+            """
+            cur.executemany(sql, data)
+            self.conn.commit()
+
     def create_dataset(self, schema_name, dataset_id, name, version, created):
         with self.conn.cursor() as cur:
             cur.execute("""
@@ -217,22 +234,9 @@ class Db(object):
             """, {'dataset_id': dataset_id, 'version': version})
             self.conn.commit()
 
-    def get_dataset_version(self, schema_name, dataset_id):
-        with self.conn.cursor() as cur:
-            cur.execute("""
-                SELECT max(version)
-                FROM adm.datasetstore
-                WHERE dataset_id = %s
-                AND schema = %s;
-            """, (dataset_id, schema_name))
-            version = cur.fetchone()
-            if version is None:
-                return None
-            return version[0]
-
     def write_features(self, schema, dataset_id, version, properties, records):
         columns = ('datasetid', 'version', 'geom', 'attribs', 'filename', 'valid')
-        f = IteratorFile(dataset_id, version, records, format_line)
+        f = IteratorFile(records, format_line)
         with self.conn.cursor() as cur:
             cur.copy_from(f, '%s.%s' % (schema, 'datastore'), columns=columns)
         self.conn.commit()

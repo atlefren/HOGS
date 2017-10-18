@@ -18,6 +18,7 @@ class OgrFeature(object):
         self._valid = None
         self._err = None
         self._srid = None
+        self._extra_data = {}
 
     @property
     def geom_valid(self):
@@ -71,24 +72,29 @@ class OgrFeature(object):
             attrs[field['name']] = value
         return attrs
 
+    def set_extra(self, data):
+        self._extra_data = data
+
     def transform(self, srs):
         self.ogr_geom.TransformTo(srs.srs)
         self._srid = srs.srid
 
     def to_db(self, out_srs):
         if not self.geom_valid:
-            return {
+            data = {
                 'valid': False,
                 'geom': self.wkt,
                 'reason': self.invalid_reason
             }
         else:
             self.transform(out_srs)
-            return {
+            data = {
                 'valid': True,
                 'geom': self.ewkb_hex,
                 'attributes': self.attributes
             }
+        data.update(self._extra_data)
+        return data
 
     def __del__(self):
         if self.ogr_feature:

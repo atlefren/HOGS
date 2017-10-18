@@ -10,10 +10,8 @@ class IteratorFile(io.TextIOBase):
         based on https://gist.github.com/jsheedy/ed81cdf18190183b3b7d
     """
 
-    def __init__(self, dataset_id, version, records, format_line):
+    def __init__(self, records, format_line):
         self._records = records
-        self._dataset_id = dataset_id
-        self._version = version
         self._format_line = format_line
         self._f = io.StringIO()
         self._count = 0
@@ -47,7 +45,5 @@ class IteratorFile(io.TextIOBase):
 
     def _get_next(self):
         record = next(self._records)
-        record['dataset_id'] = self._dataset_id
-        record['version'] = self._version
         self._count += 1
         return self._format_line(record)

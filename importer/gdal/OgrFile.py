@@ -45,9 +45,10 @@ def uniq(list_of_dicts, key):
 
 class OgrFile(object):
 
-    def __init__(self, filename, driver_name, dataset_id):
+    def __init__(self, filename, driver_name, dataset_id, version):
         self.filename = filename
         self.dataset_id = dataset_id
+        self.version = version
         self.encoding = None
         self._driver = ogr.GetDriverByName(str(driver_name))
         self._num_features = None
@@ -78,12 +79,15 @@ class OgrFile(object):
 
     @property
     def features(self):
-        if self._features is None:
-            self._features = []
-            for layer in self.layers:
-                for feature in layer.features():
-                    self._features.append(feature)
-        return self._features
+        filename = os.path.basename(self.filename)
+        for layer in self.layers:
+            for feature in layer.features():
+                feature.set_extra({
+                    'version': self.version,
+                    'dataset_id': self.dataset_id,
+                    'filename': filename
+                })
+                yield feature
 
     @property
     def fields(self):

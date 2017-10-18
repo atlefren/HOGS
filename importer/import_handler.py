@@ -4,14 +4,13 @@ import datetime
 import logging
 
 from import_to_jsonb import import_datasets as import_jsonb
-from importer.postgis import JsonbDb
+from importer.postgis import JsonbDb, TableDb
 
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-def init_db_jsonb(config):
-    db = JsonbDb(config['database'])
+def init_db(db, config):
     if not db.check_adm_exists():
         logging.info('[DEFAULT] Create adm schema')
         db.create_adm_table()
@@ -33,11 +32,14 @@ def do_import_paralell(config):
     logging.info('[DEFAULT] Import %s datasets' % num_datasets)
     logging.info('[DEFAULT] Use %s threads' % num_threads)
 
-
     if config['data_layout'] == 'jsonb':
-        db = init_db_jsonb(config)
+        db = JsonbDb(config['database'])
+        init_db(db, config)
         import_jsonb(config['datasets'], num_threads=num_threads, database=db)
-
+    elif config['data_layout'] == 'tables':
+        db = TableDb(config['database'])
+        init_db(db, config)
+        import_table(config['datasets'], num_threads=num_threads, database=db)
     else:
         logging.warn('[DEFAULT] Data layout %s is unknown' % config['data_layout'])
 

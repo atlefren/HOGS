@@ -4,6 +4,26 @@ from OgrFeature import OgrFeature
 from importer.helpers import normalize
 
 
+def get_pg_type(ogr_type):
+    types = {
+        0: 'integer',
+        1: 'integer[]',
+        2: 'real',
+        3: 'real[]',
+        4: 'text',
+        5: 'text[]',
+        6: 'text',
+        7: 'text[]',
+        8: 'bytea',
+        9: 'date',
+        10: 'time',
+        11: 'timestamp',
+        12: 'bigint',
+        13: 'bigint[]',
+    }
+    return types[ogr_type]
+
+
 class OgrLayer(object):
     def __init__(self, ogr_layer, encoding):
         self.ogr_layer = ogr_layer
@@ -46,6 +66,7 @@ class OgrLayer(object):
                     'name': field_name,
                     'normalized': normalize(field_name),
                     'index': index,
-                    'type': field_type
+                    'type': field_type,
+                    'pg_type': get_pg_type(field_type)
                 })
         return self._schema
