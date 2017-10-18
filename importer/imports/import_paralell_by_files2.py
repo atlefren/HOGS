@@ -64,7 +64,7 @@ def do_import(worker_id, database, file_queue, out_srs, num_items):
                 d = feature.to_db(out_srs)
                 d['filename'] = file['file']
                 yield d
-    num_records = database.write_features(schema, dataset_id, version, fields, loop_files(initial_file, num_items))
+    num_records = database.write_features(schema, dataset_id, version, loop_files(initial_file, num_items))
 
     logging.info('[%s] Copied %s records to %s.%s' % (worker_id, num_records, schema, dataset_id))
 
@@ -96,7 +96,7 @@ def do_import_singlefile(worker_id, database, file, out_srs, num_imported):
             d['filename'] = filename_base
             yield d
 
-    num_records = database.write_features(schema, dataset_id, version, fields, loop_files())
+    num_records = database.write_features(schema, dataset_id, version, loop_files())
     num_imported.increment()
     # logging.info('[%s] Copied %s records from %s to %s.%s' % (worker_id, num_records, filename, schema, dataset_id))
 

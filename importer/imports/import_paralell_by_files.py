@@ -46,14 +46,8 @@ def do_import(worker_id, dataset, file_arr, finished_arr, lock, num_items, datab
                 handled_items += 1
                 yield feature.to_db(out_srs)
 
-    #num_records = 0
-    #for i in loop_files(num_items):
-    #    num_records += 1
-
-    fields = OgrFile(dataset['files'][0], dataset['driver'], dataset['dataset_id']).fields
-    num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], fields, loop_files(num_items))
+    num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], loop_files(num_items))
     carr.add_to_arr(finished_arr, files)
-    #print carr.print_arr(finished_arr)
     logging.info('[%s] Copied %s records to %s.%s' % (worker_id, num_records, dataset['schema'], dataset['dataset_id']))
     return num_records
 
@@ -80,7 +74,7 @@ def do_import_dummy(worker_id, dataset, file_arr, finished_arr, lock, num_items,
                 #d['filename'] = f
                 yield d
 
-    num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], dataset['fields'], loop_files(num_items))
+    num_records = database.write_features(dataset['schema'], dataset['dataset_id'], dataset['version'], loop_files(num_items))
 
     #if num_records > 0:
     logging.info('[%s] Copied %s records (%s files) to %s.%s' % (worker_id, num_records, len(files), dataset['schema'], dataset['dataset_id']))

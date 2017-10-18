@@ -72,7 +72,7 @@ INFO:root:[DEFAULT] Time spent importing: 3:04:52.371774
 
 
 -- paralell by single files, sorted by size desc
-
+INFO:root:[DEFAULT] Time spent importing: 3:05:02.050804
 
 
 

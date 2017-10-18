@@ -21,9 +21,9 @@ def import_single_dataset(conn_str, out_srid, dataset):
     database = JsonbDb(conn_str)
     out_srs = SpatialRef(out_srid)
     dataset = prepare_database_for_dataset(database, dataset)
-    fields = OgrFile(dataset['files'][0], dataset['driver'], dataset_id).fields
+    fields = OgrFile(dataset['files'][0], dataset['driver'], dataset_id, None).fields
     iterator = get_iterator(dataset, out_srs)
-    num_records = database.write_features(dataset['schema'], dataset_id, dataset['version'], fields, iterator)
+    num_records = database.write_features(dataset['schema'], dataset_id, dataset['version'], iterator)
     database.create_dataset_view(dataset['schema'], dataset_id, dataset['dataset_name'], dataset['version'], fields)
     database.write_schema_table(dataset['schema'], dataset_id, dataset['version'], fields)
     database.mark_dataset_imported(dataset['schema'], dataset_id, dataset['version'])

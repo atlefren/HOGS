@@ -84,7 +84,7 @@ class OgrFile(object):
             for feature in layer.features():
                 feature.set_extra({
                     'version': self.version,
-                    'dataset_id': self.dataset_id,
+                    'datasetid': self.dataset_id,
                     'filename': filename
                 })
                 yield feature

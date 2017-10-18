@@ -91,7 +91,7 @@ class OgrFeature(object):
             data = {
                 'valid': True,
                 'geom': self.ewkb_hex,
-                'attributes': self.attributes
+                'attribs': self.attributes
             }
         data.update(self._extra_data)
         return data

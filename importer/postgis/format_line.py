@@ -4,33 +4,26 @@ import json
 from importer.helpers import escape, DateTimeEncoder
 
 
-def format_line(record):
-    geom = '\N'
-    attributes = '\N'
-    is_valid = 'true' if record['valid'] else 'false'
-    invalid_reason = '\N'
+def get_line_formatter(columns):
 
-    filename = record.get('filename', '\N')
-    if filename == '':
-        filename = '\N'
-
-    if record['valid']:
-        geom = record['geom']
-        attributes = escape(json.dumps(
-            record['attributes'],
-            ensure_ascii=False,
-            cls=DateTimeEncoder
-        ))
-    else:
-        invalid_reason = escape(record['reason'])
-
-    line = '%s\t%s\t%s\t%s\t%s\t%s' % (
-        record.get('dataset_id', '\N'),
-        record.get('version', '10000'),
-        geom,
-        attributes,
-        filename,
-        is_valid
-    )
-
-    return unicode(line)
+    def format_line(record):
+        line_template = '\t'.join(['%s'] * len(columns))
+        data = []
+        for column in columns:
+            value = None
+            if column in record:
+                value = record[column]
+            else:
+                value = record['attribs'].get(column, None)
+            if value is None or value == '':
+                data.append('\N')
+            elif isinstance(value, dict):
+                data.append(escape(json.dumps(
+                    value,
+                    ensure_ascii=False,
+                    cls=DateTimeEncoder
+                )))
+            else:
+                data.append(value)
+        return unicode(line_template % tuple(data))
+    return format_line

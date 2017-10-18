@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from import_to_jsonb import import_datasets as import_jsonb
+from import_to_table import import_datasets as import_table
 from importer.postgis import JsonbDb, TableDb
 
 
