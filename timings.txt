@@ -86,5 +86,11 @@ INFO:root:[DEFAULT] Time spent importing: 3:05:02.050804
 "administrativeomrader";         4 806
 
 
+jsonb, paralell by files:
+    INFO:root:[DEFAULT] Time spent importing: 3:06:56.313109
+
+tables, paralell by files:
+    INFO:root:[DEFAULT] Time spent importing: 1:29:26.386114
+
 
 

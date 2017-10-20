@@ -1,6 +1,7 @@
 {
     "database": "postgres://dvh2:pass@localhost:5432/dvh2",
-    "data_layout": "tables",
+    "data_layout": "jsonb",
+    "paralell_type": "paralell_files",
     "threads": 7,
     "datasets": [
         {

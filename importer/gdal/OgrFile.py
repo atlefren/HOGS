@@ -3,9 +3,12 @@ import os
 from osgeo import ogr
 import magic
 from chardet.universaldetector import UniversalDetector
+import logging
 
 from OgrLayer import OgrLayer
 from importer.helpers import create_table_name
+
+logging.getLogger('chardet').setLevel(logging.WARNING)
 
 
 def get_encoding(filename):
@@ -18,12 +21,17 @@ def get_encoding(filename):
 
     detector = UniversalDetector()
     with open(filename) as f:
+        n = 0
         for line in f.readlines():
+            n += 1
             detector.feed(line)
             if detector.done:
                 break
-        if detector.result:
-            return detector.result.get('encoding')
+        if detector.result is not None and 'encoding' in detector.result:
+            encoding = detector.result.get('encoding')
+            if encoding is not None:
+                return encoding
+    logging.warn('Chardet did not guess charset, read whole shait.. file= %s' % filename)
     blob = open(filename).read()
     m = magic.Magic(mime_encoding=True)
     encoding = m.from_buffer(blob)

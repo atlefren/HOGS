@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import urlparse
+import logging
+
 import psycopg2
 from psycopg2 import sql
 
@@ -55,6 +57,22 @@ class BaseDb(object):
             host=hostname,
             port=port
         )
+
+    def init_db(self, config):
+        if not self.check_adm_exists():
+            logging.info('[DEFAULT] Create adm schema')
+            self.create_adm_table()
+        schemas = list(set([d['schema'] for d in config['datasets']]))
+        for schema in schemas:
+            if not self.check_schema_exists(schema):
+                logging.info('[DEFAULT] Create schema %s' % (schema))
+                self.create_schema(schema)
+
+    def prepare(self, dataset, fields):
+        pass
+
+    def finish(self, dataset, fields):
+        pass
 
     def check_adm_exists(self):
         return self.check_table_exists('adm', 'datasetstore')
