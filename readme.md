@@ -1,3 +1,19 @@
+#HOGS - Heterogenous Open Geodata Storage
+A system for storing hetrogenous geodatasets in postrgeSQL using either a tables or jsonb-layout.
+
+Works on all file types that can be read by OGR.
+
+## Importing data
+
+1. activate virtualenv
+2. Run: ```python import.py import_conf.json```
+
+
+## Other operations
+
+- query.py: run a series of queries, timing them
+- count.py: count number of files in an import config
+- prepare_n50.py: creates an import config based on a directory of zipped n50 sosi files
 
 ## Setup
 

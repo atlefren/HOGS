@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # -*- coding: utf-8 -*-
 from multiprocessing import Queue, Lock, Array, Pool, current_process, Process, RawValue
+from functools import partial
 import datetime
 import logging
 import random
 import os
 
-#from importer.postgis import JsonbDb
 from gdal import SpatialRef
 from gdal import OgrFile
 
@@ -56,6 +56,11 @@ def worker_singlefile(file_queue, conn_str, db_class, out_srs, num_imported):
         do_import_singlefile(worker_id, database, file_queue.get(), out_srs, num_imported)
 
 
+def finish(conn_str, db_class, dataset):
+    database = db_class(conn_str)
+    database.finish(dataset, dataset['fields'])
+
+
 def import_paralell_by_files(datasets, num_threads, database, db_class, out_srid):
 
     logging.info('[DEFAULT] Paralell by files, %s threads' % num_threads)
@@ -103,5 +108,5 @@ def import_paralell_by_files(datasets, num_threads, database, db_class, out_srid
     for p in jobs:
         p.join()
 
-    for dataset in datasets:
-        database.finish(dataset, fields)
+    p2 = Pool(num_threads)
+    p2.map(partial(finish, database.conn_str, db_class), datasets)

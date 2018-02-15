@@ -1,0 +1,5 @@
+Time spent querying: 0:00:25.614843
+Time spent querying: 0:00:26.226663
+Time spent querying: 0:00:23.770066
+Time spent querying: 0:00:23.695170
+Time spent querying: 0:00:24.791476

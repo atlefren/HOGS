@@ -1,0 +1,6 @@
+size, tables:
+    13201037848 bytes
+    12.29 GB
+size, jsonb:
+    18786728472 bytes
+    17.5 GB

@@ -1,0 +1,5 @@
+INFO:root:[DEFAULT] Time spent importing: 2:54:20.865055
+INFO:root:[DEFAULT] Time spent importing: 2:56:57.365754
+INFO:root:[DEFAULT] Time spent importing: 3:04:10.298633
+INFO:root:[DEFAULT] Time spent importing: 2:54:34.915018
+INFO:root:[DEFAULT] Time spent importing: 3:04:24.547298

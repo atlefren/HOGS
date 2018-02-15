@@ -5,4 +5,6 @@
 .env
 venv
 data
-n50_import.json
+n50_import_jsonb.json
+n50_import_tables.json
+areas.geojson
