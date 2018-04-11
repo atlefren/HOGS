@@ -1,4 +1,4 @@
-#HOGS - Heterogenous Open Geodata Storage
+# HOGS - Heterogenous Open Geodata Storage
 A system for storing hetrogenous geodatasets in postrgeSQL using either a tables or jsonb-layout.
 
 Works on all file types that can be read by OGR.
