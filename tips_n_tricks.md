@@ -32,3 +32,11 @@ Some reflections, and stuff learned!
 20. shapefiles are by definition in latin-1. However, this can be deviated from. Look for a .cpg file, this should contain the charset
 21. GeoDjango has actually implemented a lot of ctypes-stuff for gdal/ogr and geos
 22. Multithreading in python is a bitch
+23. 
+    select
+        t1.datname AS db_name,  
+        pg_size_pretty(pg_database_size(t1.datname)) as db_size
+    from
+        pg_database t1
+    order by
+        pg_database_size(t1.datname) desc;
