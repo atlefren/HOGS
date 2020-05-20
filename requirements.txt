@@ -11,7 +11,7 @@ cycler==0.10.0
 ecdsa==0.13
 enum34==1.1.6
 GDAL==2.2.0
-httplib2==0.9.1
+httplib2==0.18.0
 idna==2.5
 ipaddress==1.0.18
 Jinja2==2.9.6
