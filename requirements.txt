@@ -1,5 +1,5 @@
 alembic==0.9.5
-ansible==2.3.1.0
+ansible==2.9.20
 asn1crypto==0.22.0
 backports.functools-lru-cache==1.4
 bcrypt==3.1.3
