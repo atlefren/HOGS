@@ -37,4 +37,4 @@ requests==2.18.1
 six==1.10.0
 SQLAlchemy==1.1.14
 subprocess32==3.2.7
-urllib3==1.21.1
+urllib3==1.26.5
