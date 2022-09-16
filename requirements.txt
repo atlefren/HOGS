@@ -15,7 +15,7 @@ httplib2==0.9.1
 idna==2.5
 ipaddress==1.0.18
 Jinja2==2.9.6
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.0
 matplotlib==2.1.1
 numpy==1.13.3
